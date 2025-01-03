@@ -4,22 +4,38 @@ import { User } from "../db.js";
 const router = express.Router();
 
 router.post("/signup", async (req, res) => {
+  console.log(req.body);
   const { username, firstname, lastname, password } = req.body;
 
-  const alreadyExist = await User.findOne({ username });
-  console.log(alreadyExist);
+  // Validate that all required fields are present
+  if (!username || !firstname || !lastname || !password) {
+    return res.status(400).json({
+      error: "Missing required fields",
+    });
+  }
+
+  const alreadyExist = await User.findOne({ username: username });
   if (alreadyExist) {
-    console.log("User Already Exist");
-  } else {
-    const newUser = new User({
+    return res.status(409).json({
+      error: "Username already exists",
+    });
+  }
+  const newUser = new User({
+    username,
+    firstname,
+    lastname,
+    password,
+  });
+  await newUser.save();
+
+  res.status(201).json({
+    message: "User successfully registered",
+    user: {
       username,
       firstname,
       lastname,
-      password,
-    });
-    newUser.save();
-    console.log("Successfully registered");
-  }
+    },
+  });
 });
 
 router.post("/login", (req, res) => {
