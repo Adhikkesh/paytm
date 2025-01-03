@@ -4,11 +4,14 @@ import { z } from "zod";
 import { JWT_SECRETKEY } from "../config.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
+import { authMiddleware } from "../../middleware.js";
 
+const app = express();
 const router = express.Router();
 const SECRETKEY = JWT_SECRETKEY;
 const saltrounds = 10;
 
+app.use(authMiddleware())
 
 const hashPassword = (plaintext) => {
   try {
