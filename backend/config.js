@@ -1,3 +1,1 @@
-module.exports = {
-    JWT_SECRETKEY: "SKAR",
-}
+export const JWT_SECRETKEY = "SKAR";
