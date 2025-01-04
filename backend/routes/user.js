@@ -1,10 +1,10 @@
 import express from "express";
-import { User,Account } from "../db.js";
+import { User, Account } from "../db.js";
 import { z } from "zod";
 import { JWT_SECRETKEY } from "../config.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
-import { authMiddleware } from "../../middleware.js";
+import { authMiddleware } from "../middleware.js";
 
 const app = express();
 const router = express.Router();
@@ -60,7 +60,7 @@ router.post("/signup", async (req, res) => {
 
     const newAccount = new Account({
       userId: newUser._id,
-      balance: Math.floor(Math.random()*10000) + 1
+      balance: Math.floor(Math.random() * 10000) + 1,
     });
     await newAccount.save();
 
@@ -70,7 +70,7 @@ router.post("/signup", async (req, res) => {
       message: "User successfully registered",
       token: token,
       user: newUser,
-      Account: newAccount
+      Account: newAccount,
     });
   } catch (err) {
     res.status(411).json({

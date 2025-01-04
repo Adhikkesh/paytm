@@ -1,4 +1,4 @@
-import { JWT_SECRETKEY } from "./backend/config.js";
+import { JWT_SECRETKEY } from "./config.js";
 import jwt from "jsonwebtoken";
 export const authMiddleware = (req, res, next) => {
   const bearer = req.headers.authorization;
@@ -12,7 +12,6 @@ export const authMiddleware = (req, res, next) => {
   try {
     const decode = jwt.verify(token, JWT_SECRETKEY);
     req.id = decode.id;
-    console.log(decode);
     next();
   } catch (err) {
     return res
