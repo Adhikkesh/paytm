@@ -11,8 +11,6 @@ const router = express.Router();
 const SECRETKEY = JWT_SECRETKEY;
 const saltrounds = 10;
 
-app.use(authMiddleware())
-
 const hashPassword = (plaintext) => {
   try {
     const hash = bcrypt.hash(plaintext, saltrounds);
@@ -29,6 +27,11 @@ const signupSchema = z.object({
   password: z.string().nonempty("Password is Required"),
 });
 
+router.get("/", authMiddleware, (req, res) => {
+  res.status(201).json({
+    Message: "Successfull",
+  });
+});
 
 router.post("/signup", async (req, res) => {
   const { success } = signupSchema.safeParse(req.body);
@@ -67,7 +70,6 @@ router.post("/signup", async (req, res) => {
     });
   }
 });
-
 
 const signinSchema = z.object({
   username: z.string().nonempty("Username is required"),
@@ -116,16 +118,63 @@ router.post("/signin", async (req, res) => {
   }
 });
 
-router.patch("/update", (req, res) => {
-  const firstname = req.body.firstname;
-  const lastname = req.body.lastname;
-  const password = req.body.password;
+const updateSchema = z.object({
+  firstname: z.string().optional(),
+  lastname: z.string().optional(),
+  password: z.string().optional(),
+});
 
-  const user = {
-    firstname: firstname ? firstname : "",
-    lastname: lastname ? lastname : "",
-    password: password ? password : "",
-  };
+router.put("/update", authMiddleware, async (req, res) => {
+  const { success } = updateSchema.safeParse(req.body);
+  if (!success) {
+    return res.status(411).json({
+      message: "Error in Input Data",
+    });
+  }
+
+  try {
+    const id = req.id;
+    const user = await User.findOne({ _id: id });
+    if (!user) {
+      return res.status(411).json({
+        message: "token is verified but id is not present in the database",
+      });
+    }
+
+    const firstname = req.body.firstname || user.firstname;
+    const lastname = req.body.lastname || user.lastname;
+    let password = req.body.password || user.password;
+    if (req.body.password) {
+      const hashedPassword = await hashPassword(req.body.password);
+      password = hashedPassword;
+    }
+
+    await User.updateOne({
+      firstname: firstname,
+      lastname: lastname,
+      password: password,
+    });
+
+    return res.status(201).json({
+      message: "Updated Successfully",
+    });
+  } catch (err) {
+    return res.status(411).json({
+      message: "Error Occured " + err,
+    });
+  }
+});
+
+const bulkSchema = z.object({
+  firstname: z.string().optional(),
+  lastname: z.string().optional(),
+});
+
+router.get("/bulk", (req, res) => {
+  const { success } = bulkSchema.safeParse(req.body);
+  if (!success) {
+    
+  }
 });
 
 export default router;
