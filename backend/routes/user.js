@@ -149,11 +149,16 @@ router.put("/update", authMiddleware, async (req, res) => {
       password = hashedPassword;
     }
 
-    await User.updateOne({
-      firstname: firstname,
-      lastname: lastname,
-      password: password,
-    });
+    await User.updateOne(
+      { _id: id },
+      {
+        $set: {
+          firstname: firstname,
+          lastname: lastname,
+          password: password,
+        },
+      }
+    );
 
     return res.status(201).json({
       message: "Updated Successfully",
