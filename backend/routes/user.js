@@ -1,5 +1,5 @@
 import express from "express";
-import { User } from "../db.js";
+import { User,Account } from "../db.js";
 import { z } from "zod";
 import { JWT_SECRETKEY } from "../config.js";
 import jwt from "jsonwebtoken";
@@ -20,17 +20,17 @@ const hashPassword = (plaintext) => {
   }
 };
 
+router.get("/", authMiddleware, (req, res) => {
+  res.status(201).json({
+    Message: "Successfull",
+  });
+});
+
 const signupSchema = z.object({
   username: z.string().nonempty("Username required"),
   firstname: z.string().nonempty("First name required"),
   lastname: z.string().optional("lastname is optional"),
   password: z.string().nonempty("Password is Required"),
-});
-
-router.get("/", authMiddleware, (req, res) => {
-  res.status(201).json({
-    Message: "Successfull",
-  });
 });
 
 router.post("/signup", async (req, res) => {
@@ -58,11 +58,19 @@ router.post("/signup", async (req, res) => {
     });
     await newUser.save();
 
+    const newAccount = new Account({
+      userId: newUser._id,
+      balance: Math.floor(Math.random()*10000) + 1
+    });
+    await newAccount.save();
+
     const token = jwt.sign({ id: newUser._id }, SECRETKEY, { expiresIn: "1h" });
 
     res.status(201).json({
       message: "User successfully registered",
       token: token,
+      user: newUser,
+      Account: newAccount
     });
   } catch (err) {
     res.status(411).json({
