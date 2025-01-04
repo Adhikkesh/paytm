@@ -165,15 +165,26 @@ router.put("/update", authMiddleware, async (req, res) => {
   }
 });
 
-const bulkSchema = z.object({
-  firstname: z.string().optional(),
-  lastname: z.string().optional(),
-});
+router.get("/bulk", async (req, res) => {
+  const filter = req.query.filter || "";
 
-router.get("/bulk", (req, res) => {
-  const { success } = bulkSchema.safeParse(req.body);
-  if (!success) {
-    
+  try {
+    const user = await User.findOne(
+      {
+        $or: [
+          { firstname: { $regex: filter } },
+          { lastname: { $regex: filter } },
+        ],
+      },
+      { id: true, username: true, firstname: true, lastname: true }
+    );
+    return res.status(200).json({
+      user: user,
+    });
+  } catch (err) {
+    return res.status(411).json({
+      message: "Error occurred " + err,
+    });
   }
 });
 
