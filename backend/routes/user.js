@@ -6,7 +6,6 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import { authMiddleware } from "../middleware.js";
 
-const app = express();
 const router = express.Router();
 const SECRETKEY = JWT_SECRETKEY;
 const saltrounds = 10;
