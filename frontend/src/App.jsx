@@ -1,8 +1,8 @@
 import {Route,Routes} from "react-router-dom"
-import Dashboard from './components/dashboard'
-import Signin from './components/signin'
-import Signup from './components/signup'
-import Send from './components/send'
+import Dashboard from './pages/dashboard'
+import Signin from './pages/signin'
+import Signup from './pages/signup'
+import Send from './pages/send'
 
 function App() {
 
