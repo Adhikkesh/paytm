@@ -1,8 +1,7 @@
 import mongoose from "mongoose";
+import "dotenv/config"
 
-mongoose.connect(
-  "mongodb+srv://adhikkesh:1234@cluster0.lazkv.mongodb.net/Users"
-);
+mongoose.connect(process.env.DB_URL);
 
 const schema = mongoose.Schema;
 const { ObjectId } = mongoose.Schema.Types;

@@ -68,6 +68,9 @@ router.post("/transfer",authMiddleware,async (req,res) => {
             error: "Error Occured Transaction Aborted " + err
         })
     }
+    finally{
+      session.endSession();
+    }
 })
 
 export default router;
