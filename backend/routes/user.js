@@ -10,9 +10,9 @@ const router = express.Router();
 const SECRETKEY = JWT_SECRETKEY;
 const saltrounds = 10;
 
-const hashPassword = (plaintext) => {
+const hashPassword = async (plaintext) => {
   try {
-    const hash = bcrypt.hash(plaintext, saltrounds);
+    const hash = await bcrypt.hash(plaintext, saltrounds);
     return hash;
   } catch (err) {
     throw err;
@@ -21,23 +21,23 @@ const hashPassword = (plaintext) => {
 
 router.get("/", authMiddleware, (req, res) => {
   res.status(201).json({
-    Message: "Successfull",
+    Message: "Successful",
   });
 });
 
 const signupSchema = z.object({
-  username: z.string().nonempty("Username required"),
-  firstname: z.string().nonempty("First name required"),
-  lastname: z.string().optional("lastname is optional"),
-  password: z.string().nonempty("Password is Required"),
+  username: z.string().email("Invalid email"),
+  firstname: z.string().nonempty("First name required").min(2,"Firstname must be atleast 2 letters"),
+  lastname: z.string().optional(),
+  password: z.string().nonempty("Password is Required").min(2,"Lastname must be atleast 2 letters"),
 });
 
 router.post("/signup", async (req, res) => {
-  const { success } = signupSchema.safeParse(req.body);
-  if (!success) {
-    res.status(411).json({
-      error: "Incorrect Inputs",
-    });
+  const validation = signupSchema.safeParse(req.body);
+  if(!validation.success){
+    return res.status(400).json({
+      error: validation.error.errors
+    })
   }
 
   try {
@@ -72,22 +72,23 @@ router.post("/signup", async (req, res) => {
       Account: newAccount,
     });
   } catch (err) {
-    res.status(411).json({
-      error: "Error occured" + err,
-    });
+      return res.status(500).json({
+        error: "Error occured" + err,
+      });
+   
   }
 });
 
 const signinSchema = z.object({
-  username: z.string().nonempty("Username is required"),
-  password: z.string().nonempty("Password is Required"),
+  username: z.string().email("Invalid email"),
+  password: z.string().nonempty("Invalid Password"),
 });
 
 router.post("/signin", async (req, res) => {
-  const { success } = signinSchema.safeParse(req.body);
-  if (!success) {
+  const validation = signinSchema.safeParse(req.body);
+  if (!validation.success) {
     res.status(411).json({
-      err: "Enter the Username and password both",
+      err: validation.error.errors,
     });
   }
 
@@ -104,7 +105,7 @@ router.post("/signin", async (req, res) => {
     const result = bcrypt.compare(req.body.password, exist.password);
     if (result) {
       const token = jwt.sign({ id: exist._id }, SECRETKEY, { expiresIn: "1h" });
-      res.status(200).json({
+      return res.status(200).json({
         message: "Token Generated, you have logged in",
         token: token,
         user: {
@@ -114,12 +115,12 @@ router.post("/signin", async (req, res) => {
         },
       });
     } else {
-      res.status(411).json({
+      return res.status(411).json({
         message: "Error while Logging in",
       });
     }
   } catch (err) {
-    res.status(500).json({
+    return res.status(500).json({
       error: "Error during login",
     });
   }

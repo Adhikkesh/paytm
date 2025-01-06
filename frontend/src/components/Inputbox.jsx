@@ -1,4 +1,4 @@
-export default function InputBox({type,name,placeholder,content}) {
+export default function InputBox({type,name,placeholder,content,onChange,value}) {
   return (
     <div>
       <label
@@ -13,6 +13,8 @@ export default function InputBox({type,name,placeholder,content}) {
         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-sky-500 focus:border-primary-600 block w-full p-2.5"
         placeholder={placeholder}
         autoComplete="off"
+        value={value}
+        onChange={onChange}
       ></input>
     </div>
   );
