@@ -27,17 +27,23 @@ router.get("/", authMiddleware, (req, res) => {
 
 const signupSchema = z.object({
   username: z.string().email("Invalid email"),
-  firstname: z.string().nonempty("First name required").min(2,"Firstname must be atleast 2 letters"),
+  firstname: z
+    .string()
+    .nonempty("First name required")
+    .min(2, "Firstname must be atleast 2 letters"),
   lastname: z.string().optional(),
-  password: z.string().nonempty("Password is Required").min(2,"Lastname must be atleast 2 letters"),
+  password: z
+    .string()
+    .nonempty("Password is Required")
+    .min(2, "Lastname must be atleast 2 letters"),
 });
 
 router.post("/signup", async (req, res) => {
   const validation = signupSchema.safeParse(req.body);
-  if(!validation.success){
+  if (!validation.success) {
     return res.status(400).json({
-      error: validation.error.errors
-    })
+      error: validation.error.errors,
+    });
   }
 
   try {
@@ -72,10 +78,9 @@ router.post("/signup", async (req, res) => {
       Account: newAccount,
     });
   } catch (err) {
-      return res.status(500).json({
-        error: "Error occured" + err,
-      });
-   
+    return res.status(500).json({
+      error: "Error occured" + err,
+    });
   }
 });
 
@@ -102,7 +107,7 @@ router.post("/signin", async (req, res) => {
       });
     }
 
-    const result = bcrypt.compare(req.body.password, exist.password);
+    const result = await bcrypt.compare(req.body.password, exist.password);
     if (result) {
       const token = jwt.sign({ id: exist._id }, SECRETKEY, { expiresIn: "1h" });
       return res.status(200).json({
@@ -112,11 +117,12 @@ router.post("/signin", async (req, res) => {
           username: exist.username,
           firstname: exist.firstname,
           lastname: exist.lastname,
+          password: result,
         },
       });
     } else {
-      return res.status(411).json({
-        message: "Error while Logging in",
+      return res.status(500).json({
+        error: "Incorrect Password",
       });
     }
   } catch (err) {
@@ -182,7 +188,7 @@ router.get("/bulk", async (req, res) => {
   const filter = req.query.filter || "";
 
   try {
-    const user = await User.findOne(
+    const user = await User.find(
       {
         $or: [
           { firstname: { $regex: filter } },
@@ -192,7 +198,7 @@ router.get("/bulk", async (req, res) => {
       { id: true, username: true, firstname: true, lastname: true }
     );
     return res.status(200).json({
-      user: user,
+      users: user,
     });
   } catch (err) {
     return res.status(411).json({
@@ -200,5 +206,22 @@ router.get("/bulk", async (req, res) => {
     });
   }
 });
+
+router.post("/getuser",authMiddleware,async (req,res) => {
+  const userId = req.id;
+  try{
+    const user = await User.findOne({_id: userId});
+    const account = await Account.findOne({userId: userId});
+    return res.status(201).json({
+      name: user.firstname,
+      balance: account.balance,
+      username: user.username
+    })
+  }catch(err){
+    return res.status(411).json({
+      error: "Error Occured"
+    })
+  }
+})
 
 export default router;

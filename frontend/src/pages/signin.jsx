@@ -5,14 +5,16 @@ import InputBox from "../components/Inputbox";
 import Logo from "../components/logo";
 import { useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 export default function Signin() {
   const [formData, setformData] = useState({
     username: "",
-    password: ""
+    password: "",
   });
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   function handleChange(e) {
     const { name, value } = e.target;
@@ -26,6 +28,7 @@ export default function Signin() {
     setSuccess("");
 
     try {
+      localStorage.clear();
       const response = await axios.post(
         "http://localhost:3000/api/v1/user/signin",
         {
@@ -36,25 +39,29 @@ export default function Signin() {
         }
       );
       console.log(response);
-
+      localStorage.setItem("token", response.data.token);
       setSuccess("Successfully Logged in");
       setError("");
       setformData({
         username: "",
         password: "",
       });
+      navigate("/dashboard");
     } catch (err) {
       if (err.response && err.response.data && err.response.data.error) {
         const error = err.response.data.error;
-        const messages = error.map((error) => error.message);
-        setError(messages.join(' '))
+        if (Array.isArray(error)) {
+          const messages = error.map((error) => error.message);
+          setError(messages.join(" "));
+        }
+        else{
+          setError(error);
+        }
       } else {
         setError("An unexpected error occurred");
       }
     }
   }
-
-
 
   return (
     <section className="bg-gray-50 ">
@@ -63,8 +70,12 @@ export default function Signin() {
           <Logo />
           <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
             <Heading content="Create an account" />
-            {error && <p className="text-red-600 text-sm font-medium">{error}</p>}
-            {success && <p className="text-green-600 text-sm font-medium">{success}</p>}
+            {error && (
+              <p className="text-red-600 text-sm font-medium">{error}</p>
+            )}
+            {success && (
+              <p className="text-green-600 text-sm font-medium">{success}</p>
+            )}
             <form className="space-y-5 md:space-y-6" onSubmit={handleSubmit}>
               <InputBox
                 type="text"

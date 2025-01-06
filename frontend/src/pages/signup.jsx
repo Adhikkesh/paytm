@@ -5,6 +5,7 @@ import Heading from "../components/heading";
 import InputBox from "../components/Inputbox";
 import Logo from "../components/logo";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 export default function Signup() {
   const [formData, setformData] = useState({
@@ -16,6 +17,7 @@ export default function Signup() {
   });
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   function handleChange(e) {
     const { name, value } = e.target;
@@ -35,6 +37,7 @@ export default function Signup() {
     }
 
     try {
+      localStorage.clear();
       const response = await axios.post(
         "http://localhost:3000/api/v1/user/signup",
         {
@@ -45,6 +48,7 @@ export default function Signup() {
         }
       );
       console.log(response);
+      localStorage.setItem("token",response.data.token);
 
       setSuccess("Successfully Created");
       setError("");
@@ -55,6 +59,7 @@ export default function Signup() {
         password: "",
         confirmpassword: "",
       });
+      navigate("/dashboard");
     } catch (err) {
       if (err.response && err.response.data && err.response.data.error) {
         const error = err.response.data.error;
