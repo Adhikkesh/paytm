@@ -195,7 +195,7 @@ router.get("/bulk", async (req, res) => {
           { lastname: { $regex: filter } },
         ],
       },
-      { id: true, username: true, firstname: true, lastname: true }
+      { _id: true, username: true, firstname: true, lastname: true }
     );
     return res.status(200).json({
       users: user,

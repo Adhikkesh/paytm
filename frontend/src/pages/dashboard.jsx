@@ -17,7 +17,7 @@ export default function Dashboard() {
   const [userArray, setuserArray] = useState([]);
   const navigate = useNavigate();
 
-  async function fetchUser(filter = "",currentusername = username) {
+  async function fetchUser(filter = "", currentusername = username) {
     const response1 = await axios.get(
       "http://localhost:3000/api/v1/user/bulk",
       { params: { filter: filter } }
@@ -27,6 +27,12 @@ export default function Dashboard() {
     setuserArray(filteredArray);
     console.log("currentUser" + currentusername);
     console.log(filteredArray);
+  }
+
+  function handleSend(id,name) {
+    navigate("/send",{
+      state: {id,name}
+    });
   }
 
   useEffect(() => {
@@ -52,7 +58,7 @@ export default function Dashboard() {
           setUser(response.data.name);
           setBalance(response.data.balance);
           setUsername(response.data.username);
-          await fetchUser(filter,response.data.username);
+          await fetchUser(filter, response.data.username);
         }
       } catch (err) {
         if (err.response?.status === 401 || err.response?.status === 403) {
@@ -91,8 +97,13 @@ export default function Dashboard() {
       </div>
 
       <div className="flex flex-col justify-center mt-6 gap-y-4">
-        {userArray.map((e, index) => (
-          <User name={e.firstname} key={index} />
+        {userArray.map((e,i) => (
+          <div className="flex justify-between items-center p-4 border border-gray-300 rounded-lg" key={i}>
+            <User name={e.firstname} key={e._id} id={e._id} />
+            <button onClick={() => handleSend(e._id,e.firstname)} className="max-w-48 text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">
+              Initiate Transfer
+            </button>
+          </div>
         ))}
       </div>
     </div>

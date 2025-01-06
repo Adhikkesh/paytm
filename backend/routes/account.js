@@ -32,7 +32,7 @@ router.post("/transfer",authMiddleware,async (req,res) => {
     console.log(req.body);
     if(!success){
         return res.status(411).json({
-            message: "Invalid body"
+            error: "Invalid body"
         });
     }
 
@@ -59,13 +59,13 @@ router.post("/transfer",authMiddleware,async (req,res) => {
         await session.commitTransaction();
 
         return res.status(201).json({
-            message: "Transaction Sucessfull"
+            message: "Transaction for " + amount +" was successful"
         })
     }
     catch(err){
         session.abortTransaction();
         return res.status(411).json({
-            error: "Error Occured " + err
+            error: "Error Occured Transaction Aborted " + err
         })
     }
 })
