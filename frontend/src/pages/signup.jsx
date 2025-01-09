@@ -7,6 +7,8 @@ import Logo from "../components/logo";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
+const URL = "https://skar-pay-backend.onrender.com";
+
 export default function Signup() {
   const [formData, setformData] = useState({
     username: "",
@@ -39,7 +41,7 @@ export default function Signup() {
     try {
       localStorage.clear();
       const response = await axios.post(
-        "http://localhost:3000/api/v1/user/signup",
+        URL + "/api/v1/user/signup",
         {
           username: formData.username,
           firstname: formData.firstname,
