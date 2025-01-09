@@ -4,7 +4,7 @@ import rootRouter from "./routes/index.js"
 import cors from "cors"
 import bodyParser from "body-parser";
 
-const PORT = "https://skar-pay-backend.onrender.com";
+const PORT = process.env.PORT || 3000;
 
 const corsOptions = {
   origin: 'https://skar-pay-frontend.onrender.com',
