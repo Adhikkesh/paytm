@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
+
+const URL = "https://skar-pay-backend.onrender.com";
+
 export default function Send() {
   const [Id, setId] = useState("");
   const [fname, setName] = useState("");
@@ -17,7 +20,7 @@ export default function Send() {
       try {
         const token = localStorage.getItem("token");
         const response = await axios.post(
-          "http://localhost:3000/api/v1/user/getuser",
+          URL + "/api/v1/user/getuser",
           {},
           {
             headers: {
@@ -39,7 +42,7 @@ export default function Send() {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.post(
-        "http://localhost:3000/api/v1/account/transfer",
+        URL + "/api/v1/account/transfer",
         { to: id, amount: amount },
         {
           headers: {
