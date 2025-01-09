@@ -97,7 +97,7 @@ export default function Signin() {
               <BottomWarning
                 content="Don't have an account"
                 type="Sign Up"
-                to="/signup"
+                to="/"
               />
             </form>
           </div>
