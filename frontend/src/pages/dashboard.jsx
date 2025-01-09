@@ -9,6 +9,8 @@ import DashboardHeader from "../components/DashboardHeader";
 import Balance from "../components/balance";
 import InputDashboard from "../components/dashboardinput";
 
+const URL = "https://skar-pay-backend.onrender.com";
+
 export default function Dashboard() {
   const [username, setUsername] = useState("");
   const [user, setUser] = useState("");
@@ -19,7 +21,7 @@ export default function Dashboard() {
 
   async function fetchUser(filter = "", currentusername = username) {
     const response1 = await axios.get(
-      "http://localhost:3000/api/v1/user/bulk",
+      URL + "/api/v1/user/bulk",
       { params: { filter: filter } }
     );
     const arr = response1.data.users;
@@ -45,7 +47,7 @@ export default function Dashboard() {
     const fetchData = async () => {
       try {
         const response = await axios.post(
-          "http://localhost:3000/api/v1/user/getuser",
+          URL + "/api/v1/user/getuser",
           {},
           {
             headers: {
