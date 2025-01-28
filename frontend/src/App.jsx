@@ -8,10 +8,13 @@ function App() {
 
   return (
     <Routes>
-      <Route path="/dashboard" element={<Dashboard/>}/>
-      <Route path="/signin" element={<Signin/>}/>
-      <Route path="/" element={<Signup/>}/>
-      <Route path="/send" element={<Send/>}/>
+      <Route path="/">
+        <Route index element={<Signin />} />
+        <Route path="/dashboard" element={<Dashboard/>}/>
+        <Route path="/signin" element={<Signin/>}/>
+        <Route path="/" element={<Signup/>}/>
+        <Route path="/send" element={<Send/>}/>
+      </Route>
     </Routes>
   )
 }
